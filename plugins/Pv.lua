@@ -1,15 +1,26 @@
+if not database.blacklist then
+	database.blacklist = {}
+end
+
 local triggers = {
 	'^/a[@'..bot.username..']*',
 	'^/u[@'..bot.username..']*',
 }
 
 local action = function(msg)
+	if database.blacklist[msg.from.id_str] then
+		return -- End if the sender is blacklisted.
+	end
     if msg.chat.type ~= 'private' then
         return nil
     end
     if string.match(msg.text, '^/a') then
         local receiver = config.admin
         local input = msg.text:input()
+	if database.blacklist[msg.from.id_str] then
+		return -- End if the sender is blacklisted.
+	end
+
         if not input then
             sendMessage(msg.from.id, 'Nil Value')
             return nil
@@ -23,15 +34,18 @@ local action = function(msg)
 	    local target = msg.message_id
 				local feed = msg.text:sub(4, 14)
 		local text = ''..feed..''
-			local blacklist = load_data('blacklist.json')
-			if blacklist[msg.from.id_str] then
+	if database.blacklist[msg.from.id_str] then
 		return -- End if the sender is blacklisted.
 	end
 
 			    forwardMessage (receiver, msg.from.id, target)
-
-	    sendMessage(msg.from.id, '*pm sent*\n*Arman Bot Service Msg\n*Your Pm⬇️\n\n'..input, true, false, true) -- You Can ReplaceArman Bot Service Msg
+	if database.blacklist[msg.from.id_str] then
+		return -- End if the sender is blacklisted.
 	end
+
+	    sendMessage(msg.from.id, '*pm sent*\n*Arman Bot Service Msg\n*Your Pm??\n\n'..input, true, false, true) -- You Can ReplaceArman Bot Service Msg
+	end
+	
 	if string.match(msg.text, '^/u') then
 	    if msg.from.id ~= config.admin then
 	        return nil
@@ -43,9 +57,10 @@ local action = function(msg)
 			local blacklist = load_data('blacklist.json')
 		local input = msg.text:input()
 		if not input then
-			if blacklist[msg.from.id_str] then
+	if database.blacklist[msg.from.id_str] then
 		return -- End if the sender is blacklisted.
 	end
+
 
             sendMessage(msg.from.id, 'Type /u <Pm>"')
             return nil
@@ -55,12 +70,16 @@ local action = function(msg)
 		local receiver = msg.forward_from.id
 		local feed = msg.text:sub(4, 14)
 		local text = ''..input
-			local blacklist = load_data('blacklist.json')
-			if blacklist[msg.from.id_str] then
+	if database.blacklist[msg.from.id_str] then
 		return -- End if the sender is blacklisted.
 	end
 
+
 		sendMessage(receiver, text, true, false, true)
+	if database.blacklist[msg.from.id_str] then
+		return -- End if the sender is blacklisted.
+	end
+
 		sendMessage(config.admin, ' _SuccessFully Sent_:\n\n'..input, true, false, true)
 	end
 end

@@ -1,20 +1,20 @@
 local triggers = {
 	'^/help[@'..bot.username..']*',
-	'^/start[@'..bot.username..']*',
-        '^/about[@'..bot.username..']*'
+	'^/start[@'..bot.username..']*'
 }
 
 local action = function(msg)
-    
-    print('\n/help or /start or /about', msg.from.first_name..' ['..msg.from.id..']')
-    
-    
+    if string.match(msg.text, '^/help') then
     local text = ''
-    if msg.chat.type == 'private' then
-        text = text..'Hey, *'..msg.from.first_name..'*!\n'
-        ..'\n*WELCOME TO ARMAN PV!*\n[GitHub](github.com/thisisarman)\n _Send Pm With_ \n `/a YourPm!` \n *this bot is open sourced*\n [source](https://github.com/ThisIsArman/TelegramLuaBot)\n'
+    if msg.chat.type == 'group' or msg.chat.type == 'supergroup' then
+        text = text..'*WELCOME TO ARMAN PV!*\n[GitHub](github.com/thisisarman)\n_Send Pm With_\n/`/a YourPm!`\n'  --You Can Replace WELCOME TO ARMAN PV!
+
+        sendReply(msg, 'I\'ve send you the requested information in private.\nIf you have never used me before, please start a conversation with me and ask for help here again.')
     end
     
+    if msg.chat.type == 'private' then
+        text = text..'*WELCOME TO ARMAN PV!*\n[GitHub](github.com/thisisarman)\n_Send Pm With_\n`/a YourPm!`\n' --You Can Replace WELCOME TO ARMAN PV!
+    end
     sendMessage(msg.from.id, text, true, false, true)
 end
 
@@ -22,3 +22,4 @@ return {
 	action = action,
 	triggers = triggers
 }
+end
