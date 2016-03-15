@@ -1,15 +1,17 @@
  -- This plugin will allow the admin to blacklist users who will be unable to
  -- use the bot. This plugin should be at the top of your plugin list in config.
 
+if not database.blacklist then
+	database.blacklist = {}
+end
+
 local triggers = {
 	''
 }
 
  local action = function(msg)
 
-	local blacklist = load_data('blacklist.json')
-
-	if blacklist[msg.from.id_str] then
+	if database.blacklist[msg.from.id_str] then
 		return -- End if the sender is blacklisted.
 	end
 
@@ -21,25 +23,40 @@ local triggers = {
 		return -- End if the user isn't admin.
 	end
 
-	local input = msg.text:input()
-	if not input then
-		if msg.reply_to_message then
-			input = tostring(msg.reply_to_message.from.id)
+	local target, input
+	if msg.reply_to_message then
+		target = msg.reply_to_message.from.id
+	else
+		input = msg.text:input()
+		if input then
+			input = get_word(input, 1)
+			if tonumber(input) then
+				target = input
+			else
+				target = resolve_username(input)
+				if target == nil then
+					sendReply(msg, 'Sorry, I do not recognize that username.')
+					return
+				elseif target == false then
+					sendReply(msg, 'Invalid ID or username.')
+					return
+				end
+			end
 		else
-			sendReply(msg, 'You must use this command via reply or by specifying a user\'s ID.')
+			sendReply(msg, 'You must use this command via reply or by specifying an ID or username.')
 			return
 		end
 	end
 
-	if blacklist[input] then
-		blacklist[input] = nil
-		sendReply(msg, input .. ' has been UNBLOCKED!')
-	else
-		blacklist[input] = true
-		sendReply(msg, input .. ' has been BLOCKED!')
-	end
+	target = tostring(target)
 
-	save_data('blacklist.json', blacklist)
+	if database.blacklist[target] then
+		database.blacklist[target] = nil
+		sendReply(msg, ' has been removed from the blacklist.')
+	else
+		database.blacklist[target] = true
+		sendReply(msg, ' has been added to the blacklist.')
+	end
 
  end
 

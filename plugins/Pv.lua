@@ -1,71 +1,67 @@
-local triggers = {
-	'^/a[@'..bot.username..']*',
-	'^/u[@'..bot.username..']*',
-}
 
-local action = function(msg)
-    if msg.chat.type ~= 'private' then
-        return nil
-    end
-    if string.match(msg.text, '^/a') then
-        local receiver = config.admin
-        local input = msg.text:input()
-        if not input then
-            sendMessage(msg.from.id, 'Nil Value')
-            return nil
-        end
-        local last_name = ''
-        --if msg.from.last_name then
-            --last_name = '\n*Last*: '..msg.from.last_name
-        --end
-        --local text = '*First*: '..msg.from.first_name..last_name..'\n*Username*: @'..msg.from.username..' ('..msg.from.id..')\n\n'..input
-	    --sendMessage(receiver, text, true, false, true)
-	    local target = msg.message_id
-				local feed = msg.text:sub(4, 14)
-		local text = ''..feed..''
-			local blacklist = load_data('blacklist.json')
-			if blacklist[msg.from.id_str] then
-		return -- End if the sender is blacklisted.
-	end
+ -- This plugin will allow the admin to blacklist users who will be unable to
+ -- use the bot. This plugin should be at the top of your plugin list in config.
 
-			    forwardMessage (receiver, msg.from.id, target)
-
-	    sendMessage(msg.from.id, '*pm sent*\n*Arman Bot Service Msg\n*Your Pm⬇️\n\n'..input, true, false, true) -- You Can ReplaceArman Bot Service Msg
-	end
-	if string.match(msg.text, '^/u') then
-	    if msg.from.id ~= config.admin then
-	        return nil
-	    end
-	    if not msg.reply_to_message then
-            sendReply(msg, 'Reply to  Feedback!', false)
-			return nil
-		end
-			local blacklist = load_data('blacklist.json')
-		local input = msg.text:input()
-		if not input then
-			if blacklist[msg.from.id_str] then
-		return -- End if the sender is blacklisted.
-	end
-
-            sendMessage(msg.from.id, 'Type /u <Pm>"')
-            return nil
-        end
-		msg = msg.reply_to_message
-		local name = msg.forward_from.first_name
-		local receiver = msg.forward_from.id
-		local feed = msg.text:sub(4, 14)
-		local text = ''..input
-			local blacklist = load_data('blacklist.json')
-			if blacklist[msg.from.id_str] then
-		return -- End if the sender is blacklisted.
-	end
-
-		sendMessage(receiver, text, true, false, true)
-		sendMessage(config.admin, ' _SuccessFully Sent_:\n\n'..input, true, false, true)
-	end
+if not database.blacklist then
+	database.blacklist = {}
 end
 
-return {
+local triggers = {
+	''
+}
+
+ local action = function(msg)
+
+	if database.blacklist[msg.from.id_str] then
+		return -- End if the sender is blacklisted.
+	end
+
+	if not string.match(msg.text_lower, '^/blacklist') then
+		return true
+	end
+
+	if msg.from.id ~= config.admin then
+		return -- End if the user isn't admin.
+	end
+
+	local target, input
+	if msg.reply_to_message then
+		target = msg.reply_to_message.from.id
+	else
+		input = msg.text:input()
+		if input then
+			input = get_word(input, 1)
+			if tonumber(input) then
+				target = input
+			else
+				target = resolve_username(input)
+				if target == nil then
+					sendReply(msg, 'Sorry, I do not recognize that username.')
+					return
+				elseif target == false then
+					sendReply(msg, 'Invalid ID or username.')
+					return
+				end
+			end
+		else
+			sendReply(msg, 'You must use this command via reply or by specifying an ID or username.')
+			return
+		end
+	end
+
+	target = tostring(target)
+
+	if database.blacklist[target] then
+		database.blacklist[target] = nil
+		sendReply(msg, ' has been removed from the blacklist.')
+	else
+		database.blacklist[target] = true
+		sendReply(msg, ' has been added to the blacklist.')
+	end
+
+ end
+
+ return {
 	action = action,
 	triggers = triggers
 }
