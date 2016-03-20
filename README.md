@@ -7,5 +7,7 @@
  sudo luarocks install luasocket
  sudo luarocks install luasec
  cd ..
-bash```
+```
+
 # then clone 
+
