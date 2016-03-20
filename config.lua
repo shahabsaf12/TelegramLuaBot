@@ -1,5 +1,5 @@
 return {
-	bot_api_key = '204669943:AAFaXSvZtL_tUfBX-gX3-dhA995o4BpzqNI', --token
+	bot_api_key = '140659784:AAFYvLOleFgA0p3YCwnTS5NGcMamBfTmNmo', --token
 	bot_api_key = '',
 	google_api_key = '',
 	google_cse_key = '',
@@ -18,7 +18,7 @@ return {
 	admin = 102490691,
 	admin_name = 'John Smith',
 	log_chat = nil,
-	about_text = [[
+	about_text = [[Lion Team Spectre V.1
 
 ]]	,
 	errors = {
@@ -57,7 +57,7 @@ return {
 	},
 	moderation = {
 		admins = {
-			['102490691'] = 'Arman'
+			['119989724'] = 'Shahab'
 		},
 		errors = {
 			antisquig = 'This group is English-only.',
@@ -65,13 +65,14 @@ return {
 			not_mod = 'This command must be run by a moderator.',
 			not_admin = 'This command must be run by an administrator.',
 		},
-		admin_group = -00000000,
+		admin_group = -141158061,
 		realm_name = 'My Realm',
 		antisquig = false
 	},
 	plugins = {
-		'Block.lua',
-		'Help.lua',
-		'PV.lua'
+		'about.lua',
+		'calculator.lua',
+		'google.lua',
+                'id.lua'
 	}
 }
