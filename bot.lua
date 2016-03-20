@@ -119,7 +119,7 @@ while is_started do -- Start a loop while the bot should be running.
 			end
 		end
 	end
---a
+
 end
 
  -- Save the database before exiting.
