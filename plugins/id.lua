@@ -1,7 +1,7 @@
 local triggers = {
   '^/id[@'..bot.username..']*',
 }
-— code by @pnmvhd
+— code by @Shahabambesik
 local action = function(msg)
     if string.match(msg.text, '^/id') then
     local text = ''
