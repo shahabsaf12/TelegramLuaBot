@@ -1,4 +1,4 @@
--- Module options:
+-- Module options: 
 --COPYRIGHT 2016
 local always_try_using_lpeg = true
 local register_global_module_table = false
@@ -641,75 +641,4 @@ function json.use_lpeg ()
   local U16Sequence = (P"\\u" * g.C (HexDigit * HexDigit * HexDigit * HexDigit))
   local UnicodeEscape = g.Cmt (U16Sequence * U16Sequence, UTF16Surrogate) + U16Sequence/UTF16BMP
   local Char = UnicodeEscape + EscapeSequence + PlainChar
-  local String = P"\"" * g.Cs (Char ^ 0) * (P"\"" + Err "unterminated string")
-  local Integer = P"-"^(-1) * (P"0" + (R"19" * R"09"^0))
-  local Fractal = P"." * R"09"^0
-  local Exponent = (S"eE") * (S"+-")^(-1) * R"09"^1
-  local Number = (Integer * Fractal^(-1) * Exponent^(-1))/str2num
-  local Constant = P"true" * g.Cc (true) + P"false" * g.Cc (false) + P"null" * g.Carg (1)
-  local SimpleValue = Number + String + Constant
-  local ArrayContent, ObjectContent
-
-  -- The functions parsearray and parseobject parse only a single value/pair
-  -- at a time and store them directly to avoid hitting the LPeg limits.
-  local function parsearray (str, pos, nullval, state)
-    local obj, cont
-    local npos
-    local t, nt = {}, 0
-    repeat
-      obj, cont, npos = pegmatch (ArrayContent, str, pos, nullval, state)
-      if not npos then break end
-      pos = npos
-      nt = nt + 1
-      t[nt] = obj
-    until cont == 'last'
-    return pos, setmetatable (t, state.arraymeta)
-  end
-
-  local function parseobject (str, pos, nullval, state)
-    local obj, key, cont
-    local npos
-    local t = {}
-    repeat
-      key, obj, cont, npos = pegmatch (ObjectContent, str, pos, nullval, state)
-      if not npos then break end
-      pos = npos
-      t[key] = obj
-    until cont == 'last'
-    return pos, setmetatable (t, state.objectmeta)
-  end
-
-  local Array = P"[" * g.Cmt (g.Carg(1) * g.Carg(2), parsearray) * Space * (P"]" + Err "']' expected")
-  local Object = P"{" * g.Cmt (g.Carg(1) * g.Carg(2), parseobject) * Space * (P"}" + Err "'}' expected")
-  local Value = Space * (Array + Object + SimpleValue)
-  local ExpectedValue = Value + Space * Err "value expected"
-  ArrayContent = Value * Space * (P"," * g.Cc'cont' + g.Cc'last') * g.Cp()
-  local Pair = g.Cg (Space * String * Space * (P":" + Err "colon expected") * ExpectedValue)
-  ObjectContent = Pair * Space * (P"," * g.Cc'cont' + g.Cc'last') * g.Cp()
-  local DecodeValue = ExpectedValue * g.Cp ()
-
-  function json.decode (str, pos, nullval, ...)
-    local state = {}
-    state.objectmeta, state.arraymeta = optionalmetatables(...)
-    local obj, retpos = pegmatch (DecodeValue, str, pos, nullval, state)
-    if state.msg then
-      return nil, state.pos, state.msg
-    else
-      return obj, retpos
-    end
-  end
-
-  -- use this function only once:
-  json.use_lpeg = function () return json end
-
-  json.using_lpeg = true
-
-  return json -- so you can get the module using json = require "dkjson".use_lpeg()
-end
-
-if always_try_using_lpeg then
-  pcall (json.use_lpeg)
-end
-
-return json
-
+  local String = P"\"" * g.Cs (Char 
